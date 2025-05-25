@@ -183,7 +183,8 @@ const plugin: FastifyPluginAsyncTypebox = async (fastify) => {
         args: {
           id: { type: new GraphQLNonNull(MemberTypeIdEnum) },
         },
-        resolve: (_, { id }) => prisma.memberType.findUnique({ where: { id } }),
+        resolve: (_, { id }: { id: string }) =>
+          prisma.memberType.findUnique({ where: { id } }),
       },
       users: {
         type: new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(User))),
@@ -194,7 +195,7 @@ const plugin: FastifyPluginAsyncTypebox = async (fastify) => {
         args: {
           id: { type: new GraphQLNonNull(UUID) },
         },
-        resolve: (_, { id }) => prisma.user.findUnique({ where: { id } }),
+        resolve: (_, { id }: { id: string }) => prisma.user.findUnique({ where: { id } }),
       },
       posts: {
         type: new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(Post))),
@@ -205,7 +206,7 @@ const plugin: FastifyPluginAsyncTypebox = async (fastify) => {
         args: {
           id: { type: new GraphQLNonNull(UUID) },
         },
-        resolve: (_, { id }) => prisma.post.findUnique({ where: { id } }),
+        resolve: (_, { id }: { id: string }) => prisma.post.findUnique({ where: { id } }),
       },
       profiles: {
         type: new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(Profile))),
@@ -216,7 +217,8 @@ const plugin: FastifyPluginAsyncTypebox = async (fastify) => {
         args: {
           id: { type: new GraphQLNonNull(UUID) },
         },
-        resolve: (_, { id }) => prisma.profile.findUnique({ where: { id } }),
+        resolve: (_, { id }: { id: string }) =>
+          prisma.profile.findUnique({ where: { id } }),
       },
     },
   });
@@ -274,7 +276,7 @@ const plugin: FastifyPluginAsyncTypebox = async (fastify) => {
         args: {
           id: { type: new GraphQLNonNull(UUID) },
         },
-        resolve: async (_, { id }) => {
+        resolve: async (_, { id }: { id: string }) => {
           await prisma.user.delete({ where: { id } });
           return 'Deleted';
         },
@@ -284,7 +286,7 @@ const plugin: FastifyPluginAsyncTypebox = async (fastify) => {
         args: {
           id: { type: new GraphQLNonNull(UUID) },
         },
-        resolve: async (_, { id }) => {
+        resolve: async (_, { id }: { id: string }) => {
           await prisma.profile.delete({ where: { id } });
           return 'Deleted';
         },
@@ -294,7 +296,7 @@ const plugin: FastifyPluginAsyncTypebox = async (fastify) => {
         args: {
           id: { type: new GraphQLNonNull(UUID) },
         },
-        resolve: async (_, { id }) => {
+        resolve: async (_, { id }: { id: string }) => {
           await prisma.post.delete({ where: { id } });
           return 'Deleted';
         },
