@@ -20,10 +20,42 @@ import {
 import depthLimit from 'graphql-depth-limit';
 import { MemberTypeId } from '../member-types/schemas.js';
 
-interface User {
+interface UserArgs {
   id: string;
   name: string;
   balance: number;
+}
+
+interface CreateProfileArgs {
+  dto: {
+    isMale: boolean;
+    yearOfBirth: number;
+    userId: string;
+    memberTypeId: 'BASIC' | 'BUSINESS';
+  };
+}
+
+interface CreatePostInputArgs {
+  dto: { title: string; content: string; authorId: string };
+}
+
+interface CreateUserInputArgs {
+  dto: {
+    name: string;
+    balance: number;
+  };
+}
+
+interface ChangeUserInputArgs extends CreateUserInputArgs {
+  id: string;
+}
+
+interface ChangeProfileInputArgs extends CreateProfileArgs {
+  id: string;
+}
+
+interface ChangePostInputArgs extends CreatePostInputArgs {
+  id: string;
 }
 
 const plugin: FastifyPluginAsyncTypebox = async (fastify) => {
@@ -87,16 +119,17 @@ const plugin: FastifyPluginAsyncTypebox = async (fastify) => {
       balance: { type: new GraphQLNonNull(GraphQLFloat) },
       profile: {
         type: Profile,
-        resolve: (user: User) =>
+        resolve: (user: UserArgs) =>
           prisma.profile.findUnique({ where: { userId: user.id } }),
       },
       posts: {
         type: new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(Post))),
-        resolve: (user: User) => prisma.post.findMany({ where: { authorId: user.id } }),
+        resolve: (user: UserArgs) =>
+          prisma.post.findMany({ where: { authorId: user.id } }),
       },
       userSubscribedTo: {
         type: new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(User))),
-        resolve: (user: User) =>
+        resolve: (user: UserArgs) =>
           prisma.user.findMany({
             where: {
               subscribedToUser: {
@@ -107,7 +140,7 @@ const plugin: FastifyPluginAsyncTypebox = async (fastify) => {
       },
       subscribedToUser: {
         type: new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(User))),
-        resolve: (user: User) =>
+        resolve: (user: UserArgs) =>
           prisma.user.findMany({
             where: {
               userSubscribedTo: {
@@ -222,38 +255,6 @@ const plugin: FastifyPluginAsyncTypebox = async (fastify) => {
       },
     },
   });
-
-  interface CreateProfileArgs {
-    dto: {
-      isMale: boolean;
-      yearOfBirth: number;
-      userId: string;
-      memberTypeId: 'BASIC' | 'BUSINESS';
-    };
-  }
-
-  interface CreatePostInputArgs {
-    dto: { title: string; content: string; authorId: string };
-  }
-
-  interface CreateUserInputArgs {
-    dto: {
-      name: string;
-      balance: number;
-    };
-  }
-
-  interface ChangeUserInputArgs extends CreateUserInputArgs {
-    id: string;
-  }
-
-  interface ChangeProfileInputArgs extends CreateProfileArgs {
-    id: string;
-  }
-
-  interface ChangePostInputArgs extends CreatePostInputArgs {
-    id: string;
-  }
 
   const Mutations = new GraphQLObjectType({
     name: 'Mutations',
