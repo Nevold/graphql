@@ -20,6 +20,12 @@ import {
 import depthLimit from 'graphql-depth-limit';
 import { MemberTypeId } from '../member-types/schemas.js';
 
+interface User {
+  id: string;
+  name: string;
+  balance: number;
+}
+
 const plugin: FastifyPluginAsyncTypebox = async (fastify) => {
   const { prisma } = fastify;
 
@@ -81,15 +87,16 @@ const plugin: FastifyPluginAsyncTypebox = async (fastify) => {
       balance: { type: new GraphQLNonNull(GraphQLFloat) },
       profile: {
         type: Profile,
-        resolve: (user) => prisma.profile.findUnique({ where: { userId: user.id } }),
+        resolve: (user: User) =>
+          prisma.profile.findUnique({ where: { userId: user.id } }),
       },
       posts: {
         type: new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(Post))),
-        resolve: (user) => prisma.post.findMany({ where: { authorId: user.id } }),
+        resolve: (user: User) => prisma.post.findMany({ where: { authorId: user.id } }),
       },
       userSubscribedTo: {
         type: new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(User))),
-        resolve: (user) =>
+        resolve: (user: User) =>
           prisma.user.findMany({
             where: {
               subscribedToUser: {
@@ -100,7 +107,7 @@ const plugin: FastifyPluginAsyncTypebox = async (fastify) => {
       },
       subscribedToUser: {
         type: new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(User))),
-        resolve: (user) =>
+        resolve: (user: User) =>
           prisma.user.findMany({
             where: {
               userSubscribedTo: {
