@@ -224,7 +224,7 @@ const plugin: FastifyPluginAsyncTypebox = async (fastify) => {
         resolve: () => prisma.user.findMany(),
       },
       user: {
-        type: User,
+        type: User as GraphQLObjectType,
         args: {
           id: { type: new GraphQLNonNull(UUID) },
         },
